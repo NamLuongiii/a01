@@ -1,8 +1,20 @@
+import { useEffect } from "react";
 import "./App.css";
 import reactLogo from "./assets/react.svg";
+import { RoomService } from "./services";
 import viteLogo from "/vite.svg";
 
 function App() {
+  useEffect(() => {
+    RoomService.getAll()
+      .then((rooms) => {
+        console.log("Rooms:", rooms);
+      })
+      .catch((error) => {
+        console.error("Error fetching rooms:", error);
+      });
+  }, []);
+
   return (
     <>
       <div>
