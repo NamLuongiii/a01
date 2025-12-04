@@ -68,3 +68,44 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Default style for form elements */
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #646cff;
+  outline: none;
+}
+label {
+  font-weight: 500;
+}
+label[aria-invalid="true"] {
+  color: crimson;
+}
+::-webkit-input-placeholder {
+  color: #999;
+}
+
+::-moz-placeholder {
+  color: #999;
+}
+:-ms-input-placeholder {
+  color: #999;
+}
+:-moz-placeholder {
+  color: #999;
+}
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: crimson;
+}
