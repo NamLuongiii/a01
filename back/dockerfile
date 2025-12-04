@@ -8,11 +8,13 @@ RUN go mod download
 
 # Copy source code và build
 COPY . .
-RUN go build -o /app/app
+# RUN go build -o /app/app
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/main .
 
 # Final stage
 FROM alpine:latest
 WORKDIR /app
-COPY --from=builder /app/app /app/app
+COPY --from=builder /app/main .
 EXPOSE 8080
-CMD ["/app/app"]
+CMD ["./main"]
