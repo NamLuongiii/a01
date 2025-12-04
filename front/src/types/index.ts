@@ -10,3 +10,10 @@ export interface ApiResponse<T> {
   message: string;
   success: boolean;
 }
+
+export interface Room {
+  id: number;
+  name: string;
+  users: User[];
+  description: string;
+}
