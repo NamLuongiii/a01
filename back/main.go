@@ -54,6 +54,7 @@ func main() {
   userHandler := handlers.NewUserHandler(userRepo)
   roomHandler := handlers.NewRoomHandler(roomRepo)
   authHandler := handlers.NewAuthHandler(userRepo)
+  wsHandler := handlers.NewWebSocketHandler()
 
   router := gin.Default()
   
@@ -87,6 +88,11 @@ func main() {
          rooms.POST("/:roomId/join/:userId", roomHandler.JoinRoom)
       }
   }
+
+  // WebSocket endpoint
+  router.GET("/ws", wsHandler.HandleWebSocket)
+
+  router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 
   // Ping godoc

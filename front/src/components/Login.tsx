@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { MUTATION_KEYS } from "../constants";
-import { AuthService } from "../services/auth";
+import { AuthService } from "../services/AuthService";
 import useAuthStore from "../stores/authStore";
 
 type LoginForm = {
