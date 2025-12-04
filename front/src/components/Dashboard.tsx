@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect } from "react";
 import { QUERY_KEYS } from "../constants";
 import { RoomService } from "../services";
 import useAuthStore from "../stores/authStore";
@@ -7,6 +7,13 @@ import useAuthStore from "../stores/authStore";
 const Dashboard: React.FC = () => {
   const me = useAuthStore((state) => state.me);
   const clear = useAuthStore((state) => state.clearMe);
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8080/ws");
+    ws.onopen = () => console.log("Connected!");
+    ws.onmessage = (event) => console.log("Received:", event.data);
+    ws.send("Hello from client!");
+  }, []);
 
   // get rooms and display them
   const { data: rooms, isLoading } = useQuery({

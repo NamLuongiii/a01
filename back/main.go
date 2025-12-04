@@ -110,8 +110,6 @@ func main() {
     })
   })
 
-  router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
   router.Run() // listens on 0.0.0.0:8080 by default
   // http://localhost:8080/swagger/index.html#/example/get_example_helloworld
 }
