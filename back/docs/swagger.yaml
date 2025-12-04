@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  main.Room:
+  models.Room:
     properties:
       description:
         type: string
@@ -10,10 +10,10 @@ definitions:
         type: string
       users:
         items:
-          $ref: '#/definitions/main.User'
+          $ref: '#/definitions/models.User'
         type: array
     type: object
-  main.User:
+  models.User:
     properties:
       email:
         type: string
@@ -23,27 +23,12 @@ definitions:
         type: string
       rooms:
         items:
-          $ref: '#/definitions/main.Room'
+          $ref: '#/definitions/models.Room'
         type: array
     type: object
 info:
   contact: {}
 paths:
-  /example/helloworld:
-    get:
-      consumes:
-      - application/json
-      description: do ping
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: ping example
-      tags:
-      - example
   /rooms:
     get:
       consumes:
@@ -56,7 +41,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/main.Room'
+              $ref: '#/definitions/models.Room'
             type: array
       summary: Get all rooms
       tags:
@@ -71,14 +56,14 @@ paths:
         name: room
         required: true
         schema:
-          $ref: '#/definitions/main.Room'
+          $ref: '#/definitions/models.Room'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/main.Room'
+            $ref: '#/definitions/models.Room'
       summary: Create a new room
       tags:
       - rooms
@@ -99,7 +84,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Room'
+            $ref: '#/definitions/models.Room'
       summary: Get a room by ID
       tags:
       - rooms
@@ -125,7 +110,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.Room'
+            $ref: '#/definitions/models.Room'
       summary: Join a room
       tags:
       - rooms
@@ -141,7 +126,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/main.User'
+              $ref: '#/definitions/models.User'
             type: array
       summary: Get all users
       tags:
@@ -156,14 +141,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/main.User'
+          $ref: '#/definitions/models.User'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/main.User'
+            $ref: '#/definitions/models.User'
       summary: Create a new user
       tags:
       - users
@@ -184,7 +169,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.User'
+            $ref: '#/definitions/models.User'
       summary: Get a user by ID
       tags:
       - users
