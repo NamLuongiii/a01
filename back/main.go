@@ -1,14 +1,15 @@
 package main
 
 import (
-   "log"
-   "github.com/gin-gonic/gin"
-   docs "quickstart/docs"
-   swaggerfiles "github.com/swaggo/files"
-   ginSwagger "github.com/swaggo/gin-swagger"
-   "net/http"
-   "gorm.io/gorm"
-   "github.com/glebarez/sqlite"
+	"log"
+	"net/http"
+	docs "quickstart/docs"
+
+	"github.com/gin-gonic/gin"
+	"github.com/glebarez/sqlite"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"gorm.io/gorm"
 )
 
 // @BasePath /api/v1
@@ -18,6 +19,15 @@ type User struct {
     ID    uint   `json:"id" gorm:"primaryKey"`
     Name  string `json:"name"`
     Email string `json:"email" gorm:"unique"`
+    Rooms []Room `json:"rooms" gorm:"many2many:user_rooms;"`
+}
+
+// Room model
+type Room struct {
+    ID          uint   `json:"id" gorm:"primaryKey"`
+    Name        string `json:"name"`
+    Description string `json:"description"`
+    Users       []User `json:"users" gorm:"many2many:user_rooms;"`
 }
 
 // Database instance
@@ -106,6 +116,114 @@ func GetUser(c *gin.Context) {
     c.JSON(http.StatusOK, user)
 }
 
+// CreateRoom godoc
+// @Summary Create a new room
+// @Schemes
+// @Description Create a new chat room
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Param room body Room true "Room object"
+// @Success 201 {object} Room
+// @Router /rooms [post]
+func CreateRoom(c *gin.Context) {
+    var room Room
+    if err := c.ShouldBindJSON(&room); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    
+    if err := db.Create(&room).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusCreated, room)
+}
+
+// GetRooms godoc
+// @Summary Get all rooms
+// @Schemes
+// @Description Get all chat rooms
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Success 200 {array} Room
+// @Router /rooms [get]
+func GetRooms(c *gin.Context) {
+    var rooms []Room
+    if err := db.Preload("Users").Find(&rooms).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, rooms)
+}
+
+// GetRoom godoc
+// @Summary Get a room by ID
+// @Schemes
+// @Description Get a room by ID with users
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Param id path int true "Room ID"
+// @Success 200 {object} Room
+// @Router /rooms/{id} [get]
+func GetRoom(c *gin.Context) {
+    id := c.Param("id")
+    var room Room
+    
+    if err := db.Preload("Users").First(&room, id).Error; err != nil {
+        if err == gorm.ErrRecordNotFound {
+            c.JSON(http.StatusNotFound, gin.H{"error": "Room not found"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    c.JSON(http.StatusOK, room)
+}
+
+// JoinRoom godoc
+// @Summary Join a room
+// @Schemes
+// @Description Add user to a room
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Param roomId path int true "Room ID"
+// @Param userId path int true "User ID"
+// @Success 200 {object} Room
+// @Router /rooms/{roomId}/join/{userId} [post]
+func JoinRoom(c *gin.Context) {
+    roomId := c.Param("roomId")
+    userId := c.Param("userId")
+    
+    var room Room
+    var user User
+    
+    if err := db.First(&room, roomId).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Room not found"})
+        return
+    }
+    
+    if err := db.First(&user, userId).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+        return
+    }
+    
+    if err := db.Model(&room).Association("Users").Append(&user); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+    
+    // Load updated room with users
+    db.Preload("Users").First(&room, roomId)
+    c.JSON(http.StatusOK, room)
+}
+
 func main() {
   // Initialize Database
   var err error
@@ -115,7 +233,7 @@ func main() {
   }
 
   // Auto Migrate the schema
-  db.AutoMigrate(&User{})
+  db.AutoMigrate(&User{}, &Room{})
 
   router := gin.Default()
   docs.SwaggerInfo.BasePath = "/api/v1"
@@ -133,6 +251,15 @@ func main() {
          users.POST("", CreateUser)
          users.GET("", GetUsers)
          users.GET("/:id", GetUser)
+      }
+      
+      // Room routes
+      rooms := v1.Group("/rooms")
+      {
+         rooms.POST("", CreateRoom)
+         rooms.GET("", GetRooms)
+         rooms.GET("/:id", GetRoom)
+         rooms.POST("/:roomId/join/:userId", JoinRoom)
       }
   }
 

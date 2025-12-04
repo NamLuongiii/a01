@@ -38,6 +38,135 @@ const docTemplate = `{
                 }
             }
         },
+        "/rooms": {
+            "get": {
+                "description": "Get all chat rooms",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rooms"
+                ],
+                "summary": "Get all rooms",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.Room"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new chat room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rooms"
+                ],
+                "summary": "Create a new room",
+                "parameters": [
+                    {
+                        "description": "Room object",
+                        "name": "room",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.Room"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.Room"
+                        }
+                    }
+                }
+            }
+        },
+        "/rooms/{id}": {
+            "get": {
+                "description": "Get a room by ID with users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rooms"
+                ],
+                "summary": "Get a room by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Room ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Room"
+                        }
+                    }
+                }
+            }
+        },
+        "/rooms/{roomId}/join/{userId}": {
+            "post": {
+                "description": "Add user to a room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rooms"
+                ],
+                "summary": "Join a room",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Room ID",
+                        "name": "roomId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Room"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Get all users",
@@ -130,6 +259,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.Room": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.User"
+                    }
+                }
+            }
+        },
         "main.User": {
             "type": "object",
             "properties": {
@@ -141,6 +290,12 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "rooms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.Room"
+                    }
                 }
             }
         }
