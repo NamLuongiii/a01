@@ -1,5 +1,21 @@
 basePath: /api/v1
 definitions:
+  handlers.LoginRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  handlers.LoginResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
   models.Room:
     properties:
       description:
@@ -29,6 +45,36 @@ definitions:
 info:
   contact: {}
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user using their name
+      parameters:
+      - description: Login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+      summary: Login user by name
+      tags:
+      - auth
   /rooms:
     get:
       consumes:

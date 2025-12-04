@@ -1,28 +1,21 @@
 import { create } from "zustand";
+import type { User } from "../types";
 
-type Me = {
-  id: string;
-  name?: string;
-  email?: string;
-  avatarUrl?: string;
-  [key: string]: any;
-};
+interface Me extends User {}
 
 type AuthState = {
   me: Me | null;
+  isAuthenticated: boolean;
+
   setMe: (me: Me | null) => void;
   clearMe: () => void;
-  isAuthenticated: () => boolean;
 };
 
 const useAuthStore = create<AuthState>((set, get) => ({
   me: null,
-  setMe: (me: Me | null) => set({ me }),
-  clearMe: () => set({ me: null }),
-  isAuthenticated: () => {
-    const me = get().me;
-    return me !== null && !!me.id;
-  },
+  isAuthenticated: false,
+  setMe: (me: Me | null) => set({ me, isAuthenticated: !!me }),
+  clearMe: () => set({ me: null, isAuthenticated: false }),
 }));
 
 export default useAuthStore;

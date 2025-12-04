@@ -1,12 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { MUTATION_KEYS } from "../constants";
+import { AuthService } from "../services/auth";
+import useAuthStore from "../stores/authStore";
 
 type LoginForm = {
   name: string;
 };
 
 export default function Login() {
+  const setMe = useAuthStore((state) => state.setMe);
+
   const {
     register,
     handleSubmit,
@@ -23,7 +27,8 @@ export default function Login() {
     mutationKey: [MUTATION_KEYS.LOGIN],
     mutationFn: async (data: LoginForm) => {
       // perform login logic here
-      console.log("Performing login with:", data);
+      const result = await AuthService.login(data.name);
+      setMe(result.user || null);
     },
     onError: (error) => {
       alert(error.message);
@@ -31,36 +36,42 @@ export default function Login() {
   });
 
   return (
-    <form onSubmit={handleSubmit(submit)} noValidate style={{ maxWidth: 360 }}>
-      <div style={{ marginBottom: 12 }}>
-        <label htmlFor="name" style={{ display: "block", marginBottom: 4 }}>
-          Name
-        </label>
-        <input
-          id="name"
-          type="text"
-          {...register("name", {
-            required: "Name is required",
-          })}
-          aria-invalid={errors.name ? "true" : "false"}
-        />
-        {errors.name && (
-          <p role="alert" style={{ color: "crimson", marginTop: 6 }}>
-            {errors.name.message}
-          </p>
-        )}
-      </div>
-
-      <button
-        type="submit"
-        disabled={isPending}
-        style={{
-          padding: "8px 12px",
-          cursor: isPending ? "not-allowed" : "pointer",
-        }}
+    <div className="h-screen flex items-center justify-center text-center">
+      <form
+        onSubmit={handleSubmit(submit)}
+        noValidate
+        style={{ maxWidth: 360 }}
       >
-        {isPending ? "Signing in..." : "Sign in"}
-      </button>
-    </form>
+        <div style={{ marginBottom: 12 }}>
+          <label htmlFor="name" style={{ display: "block", marginBottom: 4 }}>
+            Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            {...register("name", {
+              required: "Name is required",
+            })}
+            aria-invalid={errors.name ? "true" : "false"}
+          />
+          {errors.name && (
+            <p role="alert" style={{ color: "crimson", marginTop: 6 }}>
+              {errors.name.message}
+            </p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isPending}
+          style={{
+            padding: "8px 12px",
+            cursor: isPending ? "not-allowed" : "pointer",
+          }}
+        >
+          {isPending ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
+    </div>
   );
 }

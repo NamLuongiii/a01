@@ -7,20 +7,14 @@ type Props = {
 };
 
 const AuthProtection: React.FC<Props> = ({ children }) => {
-  const isAuthenticate = useAuthStore((state) => state.isAuthenticated)();
+  const isAuthenticate = useAuthStore((state) => state.isAuthenticated);
 
   // if isAuthenticated() is false, redirect to login page
   if (!isAuthenticate) {
     return <Login />;
   }
 
-  return (
-    <div>
-      <h1>Hello, world!</h1>
-      <p>This is the AuthProtection component.</p>
-      {children}
-    </div>
-  );
+  return children;
 };
 
 export default AuthProtection;

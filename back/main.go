@@ -53,6 +53,7 @@ func main() {
   // Initialize handlers
   userHandler := handlers.NewUserHandler(userRepo)
   roomHandler := handlers.NewRoomHandler(roomRepo)
+  authHandler := handlers.NewAuthHandler(userRepo)
 
   router := gin.Default()
   
@@ -63,6 +64,12 @@ func main() {
 
   v1 := router.Group("/api/v1")
   {
+      // Auth routes
+      auth := v1.Group("/auth")
+      {
+         auth.POST("/login", authHandler.Login)
+      }
+
       // User routes
       users := v1.Group("/users")
       {
