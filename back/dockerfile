@@ -1,20 +1,34 @@
-# Build stage
-FROM golang:1.25.5-alpine AS builder
+# # Build stage
+# FROM golang:1.25.5-alpine AS builder
+# WORKDIR /app
+
+# # Copy go.mod & go.sum và download dependencies
+# COPY go.mod go.sum ./
+# RUN go mod download
+
+# # Copy source code và build
+# COPY . .
+# # RUN go build -o /app/app
+# # Build the application
+# RUN CGO_ENABLED=0 GOOS=linux go build -o /app/main .
+
+# # Final stage
+# FROM alpine:latest
+# WORKDIR /app
+# COPY --from=builder /app/main .
+# EXPOSE 8080
+# CMD ["./main"]
+
+FROM golang:1.25.5-alpine
+
 WORKDIR /app
 
-# Copy go.mod & go.sum và download dependencies
+# Copy go.mod và go.sum để cài dependencies
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy source code và build
-COPY . .
-# RUN go build -o /app/app
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/main .
+# Cài Air để tự reload khi code thay đổi
+RUN go install github.com/air-verse/air@latest
 
-# Final stage
-FROM alpine:latest
-WORKDIR /app
-COPY --from=builder /app/main .
-EXPOSE 8080
-CMD ["./main"]
+# Mặc định chạy Air
+CMD ["air"]

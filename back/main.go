@@ -106,7 +106,7 @@ func main() {
   // @Router /ping [get]
   router.GET("/ping", func(c *gin.Context) {
     c.JSON(200, gin.H{
-      "message": "pong - Refactored code!! 🚀",
+      "message": "pong🚀 hehe",
     })
   })
 
